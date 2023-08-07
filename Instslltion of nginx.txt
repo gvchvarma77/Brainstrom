@@ -1,0 +1,37 @@
+Instslltion of nginx
+
+Before we download NGINX we have to refresh the apt list of available apps for download to make sure we get the latest version available from the apt repository by running the following command.
+
+cmd: sudo apt update -y
+
+And then, if there are any updates available, follow by.
+
+cmd: sudo apt upgrade
+
+
+Now let’s download and install NGINX on our server.
+
+cmd: sudo apt install nginx
+
+
+for better protection
+
+There are various firewalls that you can install on your Ubuntu 22.04 machine but the one that comes by default is the ufw firewall. We need to tell ufw to allow NGINX to expose itself to the internet so that NGINX can perform its function to sudo ufw allow 'Nginx HTTP'act as a web server.
+
+
+cmd: sudo ufw allow 'Nginx HTTP'
+
+cmd: sudo ufw allow 'Nginx HTTPS'
+
+CMD: sudo ufw allow 'OpenSSH'
+ 
+CMD: sudo ufw enable
+
+Then we verify if the rules are applied by running the following command.
+
+cmd: sudo ufw status verbose
+
+Now that we modified our firewall rules to allow NGINX to be exposed to the internet, we check if it’s live by visiting the IP address of our server on a browser.
+
+Success! The web page tells us that if we see that page, then it means the NGINX web server is successfully installed and working.
+

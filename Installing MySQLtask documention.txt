@@ -1,0 +1,48 @@
+Installing MySQL:
+
+Now that we have a working web server we will install MySQL, this application will serve us as the relational database that WordPress will utilize to save its structure and content in.
+
+Here first we install MySQL with the command.
+
+ sudo apt install mysql-server
+
+Then it proceeded to tell us how many additional packages it needed to install as dependencies of MySQL. It told us 28 new dependencies will be installed with a total size of 240 MB. We agreed to it and it installed them, now MySQL is installed. Lastly it asked us which services running on our Ubuntu machine currently needed to be restarted so changes could take effect, which we proceeded to skip.
+
+Secure MySQL With the Secure Installation Script:
+
+MySQL can be a complex piece of software. A misconfiguration can allow our server to be hacked.
+
+So right away we told it to run a script that comes bundled with MySQL to secure our server. It’s always best practice to perform this task, or the tasks this script does manually. The script is run by the following command.
+
+cmd : mysql_secure_installation
+
+we run the following command we can check which version it installed.
+
+cmd: mysql -V
+
+we can get information about the running status with the command.
+
+cmd : sudo service mysql status
+
+Creation of DataBase and User
+
+login into the mysql database using this comand 
+
+cmd: sudo mysql -u root -p
+
+creation of DataBase Using This Command
+
+cmd : create database WordPress;
+
+creation of user and password for mysql database
+
+create user"Wpuser"@"localhost" identified by "Chaitu143$";
+
+Assign the permission for the user created
+
+grant all privileges on WordPress.* to 'Wpuser'@'localhost';
+
+FLUSH PRIVILEGES instructs TiDB to reload the in-memory copy of privileges from the privilege tables.
+
+cmd: flush privileges;
+

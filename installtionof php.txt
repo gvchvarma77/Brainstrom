@@ -1,0 +1,145 @@
+Installing PHP:
+
+
+Now we are advancing deep into the LEMP stack, and we have only one of the puzzle pieces left to configure before loading WordPress onto our server.
+
+note: NGINX Does Not contain a native PHP processing engine like Apache so we have to install an addtional piece of software in order for NGINX & php to function togather software called php-fpm
+
+fpm stands for FastCGI Process Manager
+
+php-mysql. So we will install this with the following command.
+
+cmd: sudo apt install php-fpm php-mysql
+
+ configuration file for a new site at the location where NGINX stores them. We used wordpress.conf as an example but you would use your own domain name in this case.
+
+cmd:sudo nano /etc/nginx/sites-available/wordpress.conf
+
+We directed the nano text editor to create a new file, we pasted our configuration seen below, saved and exited.
+
+server {
+        listen 80;
+        root /var/www/html;
+        index index.php index.html index.htm index.nginx-debian.html;
+        server_name http://3.109.209.23/;
+
+        location / {
+                try_files $uri $uri/ =404;
+        }
+
+        location ~ \.php$ {
+                include snippets/fastcgi-php.conf;
+                fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;
+        }
+
+        location ~ /\.ht {
+                deny all;
+        }
+}
+
+
+note : in the above code in the place of server name give you server ip or dns name
+
+After creating the server block configuration and saving it, we must now enable it. We do that by creating a symbolic link from the file we just created, which is in the sites-available directory, to the sites-enabled directory that NGINX uses.
+
+cmd: sudo ln -s /etc/nginx/sites-available/wordpress.conf /etc/nginx/sites-enabled/
+
+we unlink the default configuration so that our wordpress.conf site takes over.
+
+cmd: sudo unlink /etc/nginx/sites-enabled/default
+
+we test if our configuration file is correct.
+
+cmd :sudo nginx -t
+
+Finally we reload NGINX for all the changes to take effect.
+
+cmd: sudo systemctl reload nginx
+
+Now that everything is set up we will validate that NGINX can send .php files off to our php-fpm processor.
+
+We will do that by creating a PHP file in the public files directory.
+
+We again sudo nano to create the file.
+
+
+cmd: sudo nano /var/www/html/info.php
+
+We pasted a little PHP script to pull the PHP setup info.
+<?php
+phpinfo();
+
+save it and comeout
+
+to check we can use
+
+go to you faviroute browser
+
+http://serverip or dns name /info.php
+
+Let’s remove that now, as that contains a lot of server information that shouldn’t be made public.
+
+cmd:sudo rm info.php
+
+With WordPress being a monster of an application there are lots of PHP extensions that it can utilize. Let’s install the popular ones with the following command.
+
+cmd: sudo apt install php-curl php-gd php-intl php-mbstring php-soap php-xml php-xmlrpc php-zip
+
+After apt finishes doing its thing we have to restart our PHP-FPM procesor.
+
+sudo systemctl restart php8.1-fpm
+
+We need to go back to the NGINX server block configuration so we can add a few WordPress specific configs.
+
+cmd: nano /etc/nginx/sites-available/wordpress.conf
+
+And we will add a few location directives.
+location = /favicon.ico { log_not_found off; access_log off; }
+location = /robots.txt { log_not_found off; access_log off; allow all; }
+location ~* \.(css|gif|ico|jpeg|jpg|js|png)$ {
+    expires max;
+    log_not_found off;
+}
+
+
+We will also adjust the try_files location. Let’s comment out the current one and add the following line underneath it.
+
+try_files $uri $uri/ /index.php$is_args$args;
+
+
+Everything should end up looking like the below example.
+
+server {
+        listen 80;
+        root /var/www/html;
+        index index.php index.html index.htm index.nginx-debian.html;
+        server_name 3.109.209.23;
+
+        location / {
+              #  try_files $uri $uri/ =404;
+              try_files $uri $uri/ /index.php$is_args$args;
+        }
+
+        location ~ \.php$ {
+                include snippets/fastcgi-php.conf;
+                fastcgi_pass unix:/var/run/php/php8.1-fpm.sock;
+        }
+
+        location ~ /\.ht {
+                deny all;
+        }
+
+location = /favicon.ico { log_not_found off; access_log off; }
+location = /robots.txt { log_not_found off; access_log off; allow all; }
+location ~* \.(css|gif|ico|jpeg|jpg|js|png)$ {
+    expires max;
+    log_not_found off;
+}
+}
+
+
+Let’s again check the configuration syntax
+
+cmd : nginx-t
+
+The prep is done and now we will proceed to install WordPress.

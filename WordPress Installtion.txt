@@ -1,0 +1,64 @@
+WordPress Installtion
+
+We will change directory to the /tmp directory. In Linux the /tmp directory is for placing stuff that you want to delete after the next boot up or in a pre-determind time, thus being called temporary.
+
+cmd: cd /tmp
+
+With the curl utility we will download the files of WordPress from the official WordPress website into our current /tmp direcotry.
+
+cmd:curl -LO https://wordpress.org/latest.tar.gz
+
+Now we will use the tar utility to untar the content of WordPress that we just downloaded. These are the actual files that WordPress uses.
+
+cmd : tar xzvf latest.tar.gz
+
+We will make a copy of the sample config file that WordPress comes with.
+
+cmd: cp /tmp/wordpress/wp-config-sample.php /tmp/wordpress/wp-config.php
+
+We will copy the entirity of the WordPress directory we just extracted to our public html directory.
+
+sudo cp -a /tmp/wordpress/. /var/www/html
+
+
+We can change the directory to verify that all the WordPress files are there.
+
+cmd: cd /var/www/html && ls
+
+We need to give ownership to a user and user group that NGINX creates, this user and group are called www-data. We will give it access to the directory where our WordPress files reside.
+
+cmd: sudo chown -R www-data:www-data /var/www/html 
+
+Now WordPress can be managed by NGINX because it has the appropriate permissions.
+
+We will move on to the WordPress application configuration. In the wp-config.php file we need to add certain salt keys to make things secure.
+
+there are two ways to get the salt keys
+
+way-1
+
+cmd: curl -s https://api.wordpress.org/secret-key/1.1/salt/
+
+way -2
+ 
+go to the web browser
+
+under url section give the following url 
+
+url: https://api.wordpress.org/secret-key/1.1/salt/
+
+to cofigure wordpress use the following command
+
+sudo nano /var/www/html/wp-config.php
+
+copy the slatkeys and give the keys in the wp-config.php
+
+Then we provide the database name, database user and database password. In our example case that is wordpress, Wpuser, respectively
+
+Below the database connection information, anywhere paste the following code.
+
+With that setting WordPress is allowed to write directly to the file system. For example when uploading a new picture or plugin.
+
+That is all for the wp-config.php.
+
+
